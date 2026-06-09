@@ -14,7 +14,7 @@ if [ ! -f "$CHECKSUM_FILE" ]; then
 fi
 
 errors=0
-while IFS='|' read -r filename expected_sha256 expected_md5 expected_size; do
+while IFS='|' read -r filename expected_sha256 expected_md5 _; do
     [[ "$filename" =~ ^# ]] && continue
     [[ -z "$filename" ]] && continue
 
@@ -28,7 +28,6 @@ while IFS='|' read -r filename expected_sha256 expected_md5 expected_size; do
 
     actual_sha256=$(sha256sum "$filepath" | cut -d' ' -f1)
     actual_md5=$(md5sum "$filepath" | cut -d' ' -f1)
-    actual_size=$(stat -c%s "$filepath")
 
     if [ "$actual_sha256" != "$expected_sha256" ]; then
         echo "❌ SHA256 invalide: $filename"
@@ -41,7 +40,6 @@ while IFS='|' read -r filename expected_sha256 expected_md5 expected_size; do
         echo "❌ MD5 invalide: $filename"
         errors=$((errors + 1))
     fi
-
 done < "$CHECKSUM_FILE"
 
 if [ $errors -gt 0 ]; then

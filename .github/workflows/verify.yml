@@ -19,7 +19,7 @@ jobs:
       - name: Verify shell scripts syntax
         run: |
           echo "🔍 Checking shell scripts syntax..."
-          find build-scripts tests -name "*.sh" -exec bash -n {} \; || exit 0
+          find build-scripts tests scripts -name "*.sh" -exec bash -n {} \; || exit 0
 
       - name: Verify file structure
         run: |
@@ -32,8 +32,8 @@ jobs:
           test -d docs/
           test -d build-scripts/verification/
 
-      - name: ShellCheck
+      - name: ShellCheck (strict mode)
         uses: ludeeus/action-shellcheck@master
         with:
-          ignore: build-scripts
-          exclude: SC2002,SC2086,SC2154,SC2164
+          ignore: installpage functions.sh installfirmware.sh waitfornetwork.sh autorun
+          exclude: SC2086,SC2046,SC2034,SC1091,SC2181,SC2319,SC3037,SC2002
