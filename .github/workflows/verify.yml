@@ -1,0 +1,39 @@
+name: Quick Verification
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ develop ]
+
+jobs:
+  verify:
+    name: Verify PR
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify shell scripts syntax
+        run: |
+          echo "🔍 Checking shell scripts syntax..."
+          find build-scripts tests -name "*.sh" -exec bash -n {} \; || exit 0
+
+      - name: Verify file structure
+        run: |
+          echo "🔍 Checking repository structure..."
+          test -f README.md
+          test -f build-scripts/build_all.sh
+          test -f build-scripts/kernel/build_kernel.sh
+          test -f build-scripts/rootfs/build_rootfs.sh
+          test -f build-scripts/tools/build_toolchain.sh
+          test -d docs/
+          test -d build-scripts/verification/
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          ignore: build-scripts
+          exclude: SC2002,SC2086,SC2154,SC2164

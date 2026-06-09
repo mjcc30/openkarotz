@@ -1,0 +1,68 @@
+# OpenKarotz - .gitignore
+
+# Build outputs
+output/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# IDE specific files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Cache
+.cache/
+*.cache
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.a
+
+# Package managers
+package-lock.json
+npm-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Shell
+*nix/
+
+# Testing
+.coverage
+.nyc_output/
+
+# CI/CD specific (keep workflow files)
+!.github/workflows/
+
+# Firmware build artifacts (keep source files)
+!output/.gitkeep
+!output/**/.gitkeep

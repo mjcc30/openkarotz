@@ -1,0 +1,126 @@
+#!/bin/bash
+
+# WAIT FOR /mnt/usbkey
+while [ ! -d /mnt/usbkey ]; do
+    sleep 1
+done
+
+# USE functions.sh
+source /mnt/usbkey/functions.sh
+
+# COPY SOUNDS
+LOG "Copy Sounds..."
+CopySounds
+LOG "Copy sound OK"
+
+# SETUP TOOLS
+LOG "Setup tools..."
+SAY "firststep"
+SAY "toolssetup"
+if [ "a1a363315468944b343ffe6804a9563f" = $(/bin/md5sum /mnt/usbkey/tools2.tar | cut -d ' ' -f1) ]; then
+    tar -xf /mnt/usbkey/tools2.tar -C /tmp/
+else
+    ERROR "wrong tools.tar md5"
+	
+fi
+SAY "toolssetupOK"
+LOG "Setup tool OK"
+led_green_pulse
+sleep 2
+
+
+# SIMPLE EMPTY FILE >> TO TEST WRITE ACCESS
+SAY "step2"
+SAY "writeef"
+touch /mnt/usbkey/helloworld.txt
+if [ $? -ne 0 ]; then
+	ERROR "Error write test empty file on usbkey"
+	led_red
+	exit 1
+fi
+SAY "usbok"
+led_green_pulse
+sleep 2
+
+
+led_orange_pulse
+LOG ""
+LOG "--- Start USB Key miniil Karotz OS Setup ---"
+
+
+
+# INSTALL FIRMWARE
+LOG ""
+LOG "Install Firmware"
+SAY "step3"
+SAY "finstall"
+SAY "steptime"
+SAY "bepatient"
+SAY "noturnoff"
+SAY "biprobot"
+
+# CHECK VERSION BUT JUST TO LOG IT
+ROOTFS_VERSION="00.00.00.00"
+if [ -e /karotz/etc/rootfs_version ]; then
+    ROOTFS_VERSION=$(cat /karotz/etc/rootfs_version)
+fi
+LOG "Root Filesystem Version = ${ROOTFS_VERSION}"
+led_orange_pulse
+
+LOG "Replace Root Filesystem anyway"
+LOG "Call installfirmware.sh"
+/mnt/usbkey/installfirmware.sh
+LOG "Install Firmware ENDED"
+SAY "installok"
+led_green_pulse
+sleep 2
+
+# NETWORK
+LOG ""
+LOG "Install network"
+SAY "step4"
+SAY "netconfig"
+led_orange_pulse
+
+LOG "Copy waitfornetwork"
+cp -f /mnt/usbkey/waitfornetwork.sh /usr/scripts/ 2>> /mnt/usbkey/setuplog.txt
+LOG "CHMOD waitfornetwork"
+/bin/chmod 755 /usr/scripts/waitfornetwork.sh 2>> /mnt/usbkey/setuplog.txt
+LOG "End Install network"
+SAY "netconfigOK"
+led_green_pulse
+sleep 2
+
+#INSTALL PAGE
+SAY "step5"
+SAY "installweb"
+LOG ""
+LOG "Installing Install-page"
+led_orange_pulse
+[ ! -d "/usr/www" ] && /bin/mkdir -p /usr/www
+LOG "Copy zip to tmp"
+cp -f /mnt/usbkey/installpage.zip /tmp/installpage.zip 2>> /mnt/usbkey/setuplog.txt
+LOG "UNZIP to usr/www"
+/bin/unzip -oq /tmp/installpage.zip -d /usr/www 2>> /mnt/usbkey/setuplog.txt
+LOG "CHMOD cgi-bin"
+/bin/chmod 755 /usr/www/cgi-bin/*.sh
+LOG "End Installing Install-page"
+SAY "installwebok"
+led_green_pulse
+sleep 2
+
+# INITTAB
+LOG "Update inittab"
+UpdateInittab 2>> /mnt/usbkey/setuplog.txt
+LOG "inittab updated"
+
+# FINISHED
+
+SAY "congrat"
+SAY "installok"
+SAY "reboot"
+SAY "bip1"
+
+# End
+LOG "--- End USB Key miniil Karotz OS Setup ---"
+sync
